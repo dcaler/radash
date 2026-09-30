@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    container_name: radash-app
+    ports:
+      - "${PORT:-8261}:8261"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/radash.db}
+      ZOTERO_SQLITE: /data/zotero/zotero.sqlite
+      PROJECTS_DIR: /data/projects
+      PROFESSIONAL_DIR: /data/professional
+      OUTPUT_DIR: /app/data/output
+      TRUNDLR_URL: ${TRUNDLR_URL:-http://localhost:8251}
+      OLLAMA_URL: ${OLLAMA_URL:-http://localhost:11434}
+      OPENALEX_AUTHOR_IDS: ${OPENALEX_AUTHOR_IDS:-}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-}
+      # Secrets stay in the environment and are never echoed by the API.
+      ZOTERO_API_KEY: ${ZOTERO_API_KEY:-}
+      S2_API_KEY: ${S2_API_KEY:-}
+    volumes:
+      # Writable: the database, the embedding cache, and emitted output.
+      - radash-data:/app/data
+      # Read-only: every source raDash observes. The :ro flags are the
+      # enforcement mechanism for "raDash writes to nothing it observes" —
+      # tests/test_mounts_readonly.py checks the property, Docker provides it.
+      - ${HOST_ZOTERO_SQLITE}:/data/zotero/zotero.sqlite:ro
+      - ${HOST_PROJECTS_DIR}:/data/projects:ro
+      - ${HOST_PROFESSIONAL_DIR}:/data/professional:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8261/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  radash-data:
+    driver: local

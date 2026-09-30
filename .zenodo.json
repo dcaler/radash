@@ -1,0 +1,20 @@
+{
+  "title": "raDash",
+  "description": "<p>A research portfolio observatory. raDash reads a Zotero library, project folders and the public bibliographic indexes, fits a map of what has been read and written, and scores four opportunity signals separately rather than blending them.</p><p>It writes to nothing it observes: every source is mounted read-only, and the only artifacts it emits are text files in its own output directory.</p>",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Reeves, D. Cale"
+    }
+  ],
+  "keywords": [
+    "research portfolio",
+    "bibliometrics",
+    "literature mapping",
+    "latent semantic analysis",
+    "Zotero",
+    "OpenAlex"
+  ],
+  "license": "other-nonbusiness",
+  "access_right": "open"
+}

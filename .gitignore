@@ -1,0 +1,67 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.DS_Store
+*.db
+db.sqlite3
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cache/
+
+# Runner output (per-task and per-runner logs)
+logs/
+*.log
+
+# Local-only working files (never publish)
+.claude/
+planningDocs/
+resume
+Screenshot*.png
+
+# raDash: rendered docs are build output of tools/md2html.sh — keep the .md source
+# (commented: we DO commit docs/*.html, since docs are read as HTML)
+docs/*.html
+
+# Synology indexer artefacts, created on the NFS share
+@eaDir/
+
+# Docs that exist for the author, not for a stranger trying to run this.
+# The rule: if a file does not help someone else get the project running, it
+# stays out of the repo. These are still written and still rendered to local
+# HTML -- local and untracked, not unwritten. planningDocs/ is above on the
+# same reasoning.
+DEPLOY.md
+DESIGN.md
+
+# Local doc tooling: renders the unpublished docs, not needed to run raDash
+tools/

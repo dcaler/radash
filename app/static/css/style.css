@@ -1,0 +1,505 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --navy: #1a1a2e;
+  --navy-light: #2d3a6e;
+  --accent: #7c9ef7;
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --text: #212529;
+  --text-muted: #6c757d;
+  --border: #dee2e6;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --success: #198754;
+  --nav-height: 56px;
+  --field-bg: #ffffff;
+  --field-border: #ced4da;
+  --ok-bg: #d1e7dd; --ok-border: #a3cfbb; --ok-ink: #0a3622;
+  --warn-bg: #fff3cd; --warn-ink: #664d03;
+  --bad-bg: #f8d7da; --bad-border: #f1aeb5; --bad-ink: #842029;
+  --info-bg: #e7f1ff; --info-border: #b6d4fe; --info-ink: #084298;
+  --neutral-bg: #e9ecef; --neutral-ink: #495057;
+}
+
+/* Dark mode is selected, not inverted: its own steps against a dark surface.
+   The media query covers the operating system, the data-theme scope covers an
+   explicit choice, and the :not() guard lets a light stamp beat OS dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --navy: #0f0f1a; --navy-light: #8aa2f2; --accent: #8aa2f2;
+    --bg: #131312; --surface: #1a1a19; --text: #ececea;
+    --text-muted: #a3a29b; --border: #34332f;
+    --field-bg: #24241f; --field-border: #4a4943;
+    --ok-bg: #10291d; --ok-border: #1d5138; --ok-ink: #8fd6ae;
+    --warn-bg: #332a08; --warn-ink: #e8c76a;
+    --bad-bg: #331417; --bad-border: #6b2a30; --bad-ink: #f3a5aa;
+    --info-bg: #10203a; --info-border: #24456f; --info-ink: #9dc2f5;
+    --neutral-bg: #2a2a26; --neutral-ink: #b4b3ab;
+  }
+}
+:root[data-theme="dark"] {
+  --navy: #0f0f1a; --navy-light: #8aa2f2; --accent: #8aa2f2;
+  --bg: #131312; --surface: #1a1a19; --text: #ececea;
+  --text-muted: #a3a29b; --border: #34332f;
+  --field-bg: #24241f; --field-border: #4a4943;
+  --ok-bg: #10291d; --ok-border: #1d5138; --ok-ink: #8fd6ae;
+  --warn-bg: #332a08; --warn-ink: #e8c76a;
+  --bad-bg: #331417; --bad-border: #6b2a30; --bad-ink: #f3a5aa;
+  --info-bg: #10203a; --info-border: #24456f; --info-ink: #9dc2f5;
+  --neutral-bg: #2a2a26; --neutral-ink: #b4b3ab;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+
+nav {
+  background: var(--navy);
+  color: white;
+  height: var(--nav-height);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,.3);
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  user-select: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,.82);
+  text-decoration: none;
+  font-size: .9rem;
+  padding: .25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-links a:hover { color: white; }
+.nav-links a.active { color: white; border-bottom-color: var(--accent); }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 0;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+#nav-version {
+  margin-left: auto;
+  font-size: .7rem;
+  color: #6c8ebf;
+  opacity: .75;
+  white-space: nowrap;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 5rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 650;
+  letter-spacing: -.01em;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  margin-bottom: .6rem;
+}
+
+.lede {
+  color: var(--text-muted);
+  margin: .4rem 0 1.25rem;
+  max-width: 72ch;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.muted { color: var(--text-muted); font-size: .85rem; margin-top: .75rem; }
+.muted a { color: var(--navy-light); }
+
+.error, .ok, .info {
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: .9rem;
+  border: 1px solid;
+}
+.error { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad-ink); }
+/* "Nothing here yet" is a third thing, and must not wear the colour of a
+   fault: a fresh deploy has empty panels because nobody has pressed refresh,
+   not because anything is broken. */
+.info  { background: var(--info-bg); border-color: var(--info-border); color: var(--info-ink); }
+.ok    { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-ink); }
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+
+table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+
+thead th {
+  text-align: left;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1.5px solid var(--border);
+  padding: .45rem .6rem;
+}
+
+tbody td { padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+
+table.kv th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: .4rem .6rem .4rem 0;
+  width: 11rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .85rem;
+}
+table.kv td { padding: .4rem 0; }
+table.kv tr:last-child th, table.kv tr:last-child td { border-bottom: 0; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .85em;
+  background: #eef0f2;
+  padding: .1em .35em;
+  border-radius: 3px;
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .15rem .5rem;
+  border-radius: 12px;
+}
+
+.badge-read-only { background: var(--ok-bg); color: var(--ok-ink); }
+.badge-missing   { background: var(--neutral-bg); color: var(--neutral-ink); }
+.badge-writable  { background: var(--bad-bg); color: var(--bad-ink); }
+/* Source statuses. `stale` and `degraded` are deliberately distinct from both
+   ok and error: data that is usable-but-caveated is the common case here, and
+   collapsing it into either colour loses the whole point of the panel. */
+.badge-ok        { background: var(--ok-bg); color: var(--ok-ink); }
+.badge-stale     { background: var(--warn-bg); color: var(--warn-ink); }
+.badge-degraded  { background: var(--warn-bg); color: var(--warn-ink); }
+.badge-error     { background: var(--bad-bg); color: var(--bad-ink); }
+.num             { text-align: right; font-variant-numeric: tabular-nums; }
+.counts          { font-size: .78rem; color: var(--text-muted); }
+.counts span     { display: inline-block; margin-right: .6rem; white-space: nowrap; }
+.failures        { margin: .4rem 0 0; padding-left: 1.1rem; font-size: .8rem; color: #842029; }
+.actions         { margin: .75rem 0 0; }
+button.action    {
+  font: inherit; font-size: .85rem; padding: .35rem .8rem; cursor: pointer;
+  border: 1px solid var(--navy-light); border-radius: 4px;
+  background: var(--field-bg); color: var(--navy-light);
+}
+button.action[disabled] { opacity: .55; cursor: progress; }
+
+/* ── Narrow screens ─────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  nav { gap: 1rem; }
+  .nav-toggle { display: block; order: 3; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background: var(--navy);
+    flex-direction: column;
+    gap: 0;
+    padding: .5rem 1.5rem 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,.3);
+  }
+  .nav-links.open { display: flex; }
+  main { padding: 1.25rem 1rem 4rem; }
+  table.kv th { width: auto; }
+}
+
+/* Per-row ledger actions. Kept compact so the table still reads as data
+   rather than as a form. */
+.row-actions select, .row-actions button { font: inherit; font-size: .78rem; }
+.row-actions select {
+  padding: .2rem; border: 1px solid var(--field-border); border-radius: 4px;
+  background: var(--field-bg); color: var(--text);
+}
+.row-actions button.action { padding: .2rem .5rem; margin-top: .25rem; }
+
+/* Settings fields. One per row with its provenance and help text, rather than
+   a dense form: each of these is a judgement that deserves a sentence. */
+.setting { padding: .9rem 0; border-bottom: 1px solid var(--border); }
+.setting:last-child { border-bottom: 0; }
+.setting input {
+  width: 100%; font: inherit; font-size: .9rem; padding: .4rem;
+  border: 1px solid var(--field-border); border-radius: 4px;
+  background: var(--field-bg); color: var(--text);
+}
+.setting .actions { display: flex; gap: .5rem; align-items: center; }
+.setting .out { color: var(--text-muted); }
+
+/* ---- map ----------------------------------------------------------------
+   Chart tokens are scoped to .viz-root and declared for both themes: the
+   media query covers the OS setting, the data-theme scope covers an explicit
+   choice, and the :not() guard lets a light stamp beat OS-dark.
+   Three categorical slots, which is what validates under the all-pairs rule a
+   scatter needs. Light-mode aqua sits below 3:1 on the surface, so the legend
+   is labelled and the region table carries the same content. */
+.viz-root {
+  --surface-1: #fcfcfb;
+  --viz-ink: #52514e;
+  --viz-grid: #e4e3e0;
+  --series-1: #2a78d6;   /* read */
+  --series-2: #eb6834;   /* written */
+  --series-3: #1baf7a;   /* in progress */
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    --surface-1: #1a1a19; --viz-ink: #c3c2b7; --viz-grid: #34332f;
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  --surface-1: #1a1a19; --viz-ink: #c3c2b7; --viz-grid: #34332f;
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+}
+
+.viz-root { position: relative; }
+.map-svg { width: 100%; height: auto; background: var(--surface-1); border-radius: 6px; }
+.map-svg .grid { stroke: var(--viz-grid); stroke-width: 1; }
+/* The corpus is context: a recessive density layer establishing the shape of
+   the field. Your own work is the foreground and carries the full mark. */
+.pt-corpus { fill: var(--series-1); opacity: .28; }
+.pt-work    { fill: var(--series-2); stroke: var(--surface-1); stroke-width: 2; }
+.pt-project { fill: var(--series-3); stroke: var(--surface-1); stroke-width: 2; }
+.pt { cursor: pointer; }
+.pt-work:hover, .pt-project:hover, .pt-corpus:hover { opacity: 1; }
+.map-svg .region {
+  fill: var(--viz-ink); font-size: 11px; font-weight: 600;
+  paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px;
+}
+.map-axis-note {
+  display: flex; justify-content: space-between; gap: 1rem;
+  font-size: .78rem; color: var(--text-muted); margin-top: .4rem;
+}
+.scree-svg { width: 100%; max-width: 560px; height: 52px; }
+.scree-bar { fill: var(--series-1); }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: .6rem; font-size: .82rem; }
+.viz-key { display: inline-flex; align-items: center; gap: .35rem; }
+.swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.swatch.s1 { background: var(--series-1); }
+.swatch.s2 { background: var(--series-2); }
+.swatch.s3 { background: var(--series-3); }
+.viz-tip {
+  position: absolute; z-index: 5; pointer-events: none; max-width: 22rem;
+  background: var(--surface-1); color: var(--viz-ink);
+  border: 1px solid var(--viz-grid); border-radius: 5px;
+  padding: .35rem .5rem; font-size: .78rem; box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.region-name, .axis-name {
+  width: 100%; font: inherit; font-size: .85rem; padding: .3rem;
+  border: 1px solid var(--field-border); border-radius: 4px;
+  background: var(--field-bg); color: var(--text);
+}
+/* Axis poles: recessive, and readable over the density layer. */
+.map-svg .pole {
+  fill: var(--viz-ink); font-size: 10.5px; opacity: .85;
+  paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px;
+}
+.map-svg .axis-title { fill: var(--viz-ink); font-size: 11px; opacity: .75; }
+.map-axis-note { flex-direction: column; gap: .25rem; }
+.axis-picker {
+  display: flex; flex-wrap: wrap; gap: .9rem; align-items: center;
+  margin-bottom: .6rem; font-size: .82rem;
+}
+.axis-picker select {
+  font: inherit; font-size: .8rem; padding: .2rem;
+  border: 1px solid var(--field-border); border-radius: 4px;
+  background: var(--field-bg); color: var(--text); max-width: 22rem;
+}
+.size-key svg { vertical-align: middle; overflow: visible; }
+.size-key circle { fill: var(--series-2); stroke: var(--surface-1); stroke-width: 2; }
+/* Drift: your own centre of mass, then and now. Uses the "written" hue, since
+   that is whose movement it describes. */
+.map-svg .drift { stroke: var(--series-2); stroke-width: 2; opacity: .85; }
+.map-svg .drift-head { fill: var(--series-2); }
+.map-svg .drift-from { fill: none; stroke: var(--series-2); stroke-width: 2; opacity: .7; }
+
+/* ---- status dashboard ---------------------------------------------------
+   Single-series charts throughout, so no legend: the heading names them.
+   Every chart has a table twin, because a bar too short to see is still a
+   number somebody needs. */
+.hero { font-size: 2.1rem; font-weight: 600; margin: .2rem 0 .6rem; line-height: 1.1; }
+.hero-unit { font-size: .85rem; font-weight: 400; color: var(--text-muted); display: block; }
+.delta.up { color: var(--ok-ink); }
+.delta.down { color: var(--bad-ink); }
+
+.multiples { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .6rem; }
+.multiple { width: 168px; }
+.multiple svg { width: 100%; height: 38px; display: block; }
+.multiple-label { font-size: .78rem; margin-top: .2rem; line-height: 1.25; }
+.accr { fill: var(--series-1); opacity: .45; }
+/* The last two years carry the question the panel is asking. */
+.accr-recent { opacity: 1; }
+
+.bar-cell { min-width: 9rem; }
+.bar {
+  display: inline-block; height: 9px; border-radius: 3px;
+  background: var(--series-1); vertical-align: middle; margin-right: .4rem;
+  min-width: 2px;
+}
+.reasons { margin: 0; padding-left: 1rem; font-size: .8rem; }
+.reasons li { margin: .1rem 0; }
+
+/* ---- print ---------------------------------------------------------------
+   A dashboard people print is a dashboard people take into a meeting, so the
+   page furniture goes and the evidence stays. Link targets are written out,
+   because a printed link nobody can follow is decoration. */
+@media print {
+  :root {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000;
+    --text-muted: #444444; --border: #999999;
+  }
+  nav, .actions, button, select, input, textarea, .viz-tip { display: none !important; }
+  body { background: #fff; font-size: 11pt; }
+  main { max-width: none; padding: 0; }
+  .card {
+    border: 1px solid #999; box-shadow: none; break-inside: avoid;
+    page-break-inside: avoid; margin-bottom: .8rem;
+  }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  table { break-inside: auto; font-size: 9.5pt; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 8.5pt; color: #444; }
+  .multiples { display: block; }
+  .multiple { display: inline-block; width: 150px; vertical-align: top; }
+}
+
+/* ---- theme toggle -------------------------------------------------------- */
+.theme-toggle {
+  background: none; border: 1px solid rgba(255, 255, 255, .35); color: inherit;
+  border-radius: 4px; padding: .2rem .5rem; cursor: pointer; font: inherit;
+  font-size: .8rem; margin-left: auto;
+}
+/* The primary action on a page should not need scrolling to reach. */
+button.action.primary {
+  background: var(--navy-light); color: #fff; border-color: var(--navy-light);
+  font-weight: 600;
+}
+.scree-svg { width: 100%; max-width: 640px; height: auto; }
+.scree-value { fill: var(--viz-ink); font-size: 6px; opacity: .8; }
+.scree-tick  { fill: var(--viz-ink); font-size: 6.5px; opacity: .6; }
+.scree-axis  { fill: var(--viz-ink); font-size: 6.5px; opacity: .6; }
+.build-stamp { display: block; font-size: .78rem; color: var(--text-muted); margin-top: .2rem; }
+/* The three that are about raDash itself rather than about your work. */
+.nav-links .nav-group {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  opacity: .55; padding: 0 .2rem; align-self: center;
+}
+
+/* ---- planning ------------------------------------------------------------
+   A candidate is a block, not a table row. Four signals' worth of rows in one
+   table would invite reading down a column and comparing scores across
+   signals, which is the one comparison this page exists to refuse. */
+.candidate {
+  border-top: 1px solid var(--border); padding: .9rem 0 .2rem;
+}
+.candidate:first-of-type { border-top: 0; }
+.candidate h3 {
+  font-size: 1rem; margin: 0 0 .4rem; display: flex; gap: .4rem;
+  align-items: baseline; flex-wrap: wrap;
+}
+.candidate h4 {
+  font-size: .82rem; margin: .7rem 0 .2rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.candidate details { margin-top: .5rem; font-size: .875rem; }
+.candidate summary { cursor: pointer; color: var(--navy-light); }
+.candidate details[open] summary { margin-bottom: .4rem; }
+/* The counter-case is the one that opens by itself: everything else on the
+   row argues for the candidate. */
+.candidate details.counter summary { color: var(--warn-ink); }
+.route-row { display: flex; flex-direction: column; gap: .2rem; }
+.route-row button.action { align-self: flex-start; }
+/* Not in flight — not yet built. A progress cursor would say the wrong
+   thing about a control that is waiting on a milestone, not on a request. */
+button.action.route-btn[disabled] { cursor: not-allowed; opacity: .6; }
+
+/* ---- imports -------------------------------------------------------------
+   The one lane with no automated path. It gets a real control rather than a
+   sentence pointing at a directory inside the container. */
+.import-text {
+  width: 100%; font: inherit; font-size: .85rem; padding: .5rem;
+  border: 1px solid var(--field-border); border-radius: 4px;
+  background: var(--field-bg); color: var(--text);
+}
+/* The box offers to take a dropped file, so it shows when it is about to. */
+.import-text.dropping { border-color: var(--navy-light); border-style: dashed; }
+.import-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.steps { margin: .6rem 0; padding-left: 1.2rem; font-size: .875rem; }
+.steps li { margin: .25rem 0; }
+/* A worked example of the paste, so "select the table" has something to
+   check against. Scrolls rather than wraps: the column gaps are the point. */
+.sample {
+  font-size: .72rem; line-height: 1.35; overflow-x: auto; margin: .5rem 0;
+  padding: .5rem .6rem; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--surface-1, var(--field-bg)); color: var(--text-muted);
+}
+/* The routed action. Preview then commit, so nothing lands in output/ that
+   you have not read first. */
+.route-buttons { display: flex; gap: .5rem; align-items: center; }
+.route-preview {
+  font-size: .72rem; line-height: 1.35; overflow-x: auto; max-height: 24rem;
+  margin: .5rem 0 0; padding: .6rem; border: 1px solid var(--border);
+  border-radius: 4px; background: var(--surface-1, var(--field-bg));
+  color: var(--text);
+}
+/* A mode you flip, rather than a word you type. */
+.toggle { display: inline-flex; align-items: center; gap: .45rem; font-size: .9rem; }
+.toggle input { width: auto; }

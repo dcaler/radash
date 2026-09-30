@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>raDash</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+  <link rel="icon" href="/static/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="raDash">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">raDash</span>
+    <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    <ul class="nav-links">
+      <li><a href="#/status">Status</a></li>
+      <li><a href="#/ledger">Your work</a></li>
+      <li><a href="#/map">Landscape</a></li>
+      <li><a href="#/frontier">Frontier</a></li>
+      <li><a href="#/planning">Planning</a></li>
+      <li><a href="#/sources">Sources</a></li>
+      <li class="nav-group">Plumbing</li>
+      <li><a href="#/settings">Settings</a></li>
+      <li><a href="#/diagnostics">Diagnostics</a></li>
+    </ul>
+    <button id="theme-toggle" class="theme-toggle" type="button"
+            aria-label="Switch between light and dark">theme</button>
+    <span id="nav-version"></span>
+  </nav>
+  <main id="app"></main>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/panels.js"></script>
+  <script src="/static/js/views/status.js"></script>
+  <script src="/static/js/views/ledger.js"></script>
+  <script src="/static/js/views/map.js"></script>
+  <script src="/static/js/views/frontier.js"></script>
+  <script src="/static/js/views/planning.js"></script>
+  <script src="/static/js/views/sources.js"></script>
+  <script src="/static/js/views/settings.js"></script>
+  <script src="/static/js/views/diagnostics.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: raDash
+message: >-
+  If you refer to this software, please cite it using the metadata
+  from this file.
+type: software
+authors:
+  - family-names: Reeves
+    given-names: D. Cale
+    website: 'https://www.dcalereeves.com'
+repository-code: 'https://github.com/dcaler/radash'
+abstract: >-
+  A research portfolio observatory. raDash reads a Zotero library,
+  project folders and the public bibliographic indexes, fits a map of
+  what has been read and written, and scores four opportunity signals
+  separately rather than blending them. It writes to nothing it
+  observes: every source is mounted read-only and the two artifacts it
+  emits are text files in its own output directory.
+keywords:
+  - research portfolio
+  - bibliometrics
+  - literature mapping
+  - latent semantic analysis
+  - Zotero
+  - OpenAlex
+license: PolyForm-Noncommercial-1.0.0

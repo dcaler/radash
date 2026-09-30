@@ -1,0 +1,9 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+sqlmodel==0.0.38
+httpx==0.25.2
+pytest==7.4.3
+PyYAML==6.0.2
+# TF-IDF + truncated SVD (the default map backend) and HDBSCAN, which
+# sklearn.cluster ships from 1.3. Pulls numpy and scipy transitively.
+scikit-learn==1.5.2
