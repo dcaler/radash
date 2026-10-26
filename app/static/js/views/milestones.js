@@ -1,194 +1,211 @@
 /**
- * Milestones — where each HAARPi project stands, as HAARPi reports it.
+ * Milestones — each track's pathway to its deliverable, drawn the way the
+ * HAARPi figures draw it.
  *
- * Every figure here comes from the project's `.haarpi/status.json`, which
- * HAARPi rewrites after each verb. raDash draws it and derives none of it: a
- * milestone is done when its release exists, or *implied* done when something
- * downstream of it is, and that judgement is HAARPi's to make.
+ * Everything shown comes from the project's `.haarpi/status.json`; raDash
+ * derives none of it.
  *
- * The layout follows the file. The shared stages run in one line; after the
- * paper's shared rungs each venue is its own track — its outline, draft,
- * submission and deck — because a paper submitted to one venue and being
- * reworked for another is two processes, and one of them has succeeded.
+ * A **track** is one pathway to one deliverable: SchellingChords for CSS 2026
+ * and SchellingChords for Leonardo are two tracks, sharing the stages before
+ * the paper forks and nothing after. A project with no venue chosen yet is one
+ * track that stops at the fork.
  *
- * The trundlr work in each row is as old as the file, so the file's age sits
- * beside it.
+ * Every track is laid on the same columns, literature review through deck, so
+ * how far each has come reads straight down the page, and the rows are sorted
+ * by it. State is carried by form rather than colour, as in the figures: an
+ * artifact that exists is drawn as one, a step not reached is a dot on the
+ * path, and the path is solid as far as the work has come.
  */
 (function () {
   'use strict';
 
-  const STATE_LABEL = {
-    done: 'done',
-    in_flight: 'in flight',
-    open: 'opened, no document yet',
-    unlocked: 'unlocked, not opened',
-    waiting: 'waiting on an earlier release',
-    not_started: 'not started',
-  };
+  const COLUMNS = [
+    { key: 'litreview', label: 'literature review' },
+    { key: 'methodsreview', label: 'methods review' },
+    { key: 'design', label: 'design' },
+    { key: 'build', label: 'build' },
+    { key: 'experiments', label: 'experiments' },
+    { key: 'onepager', label: 'one-pager' },
+    { key: 'venue', label: 'venue' },
+    { key: 'outline', label: 'outline' },
+    { key: 'draft', label: 'draft' },
+    { key: 'submission', label: 'submission' },
+    { key: 'deck', label: 'deck' },
+  ];
 
-  // Whose move it is. `tool` is the one to notice: markup is waiting for a
-  // `haarpi next` that nothing has queued, so nothing will happen by itself.
-  const WAITING_LABEL = {
-    you: 'with you',
-    tool: 'needs haarpi next',
-    queue: 'queued',
-    running: 'running',
-  };
+  const WAITING = { you: 'with you', tool: 'needs next', queue: 'queued', running: 'running' };
 
-  function fileAge(p) {
-    const d = p.age_days;
-    if (d === null || d === undefined) return 'age unknown';
-    return d < 1 / 24 ? 'just now' : d < 1 ? `${Math.round(d * 24)}h ago`
-      : `${d.toFixed(0)} days ago`;
+  const LABEL_W = 200;
+  const COL_W = 96;
+  const ROW_H = 46;
+  const HEAD_H = 56;
+  const ART_W = 24;
+  const ART_H = 18;
+
+  /** Which column a milestone id lands in. */
+  function columnOf(id) {
+    const parts = id.split('.');
+    if (parts[0] === 'paper') return parts[parts.length - 1];
+    if (parts[0] === 'deck') return 'deck';
+    return parts[0];
   }
 
-  /** `paper.css2026.outline` → `outline`; the track says which venue. */
-  function milestoneLabel(m) {
-    const parts = m.id.split('.');
-    if (parts[0] === 'paper') {
-      const last = parts[parts.length - 1];
-      return last === 'onepager' ? 'one-pager' : last;
-    }
-    if (parts[0] === 'deck') return `deck · ${parts.slice(1).join('.')}`;
-    return m.id;
+  /** How far a step has got: done beats in flight beats opened. */
+  function rank(m) {
+    return m.state === 'done' ? 3 : m.state === 'in_flight' ? 2 : m.state === 'open' ? 1 : 0;
   }
 
-  function milestoneChip(m) {
-    const tasks = (m.open_tasks || []).map(t =>
-      `  ${t.title} (${t.status}, ${t.resource || '?'}${t.hours ? `, ${t.hours.toFixed(1)}h` : ''})`);
-    const tip = [
-      `${m.id}: ${STATE_LABEL[m.state] || m.state}${m.implied ? ' — implied by later work' : ''}`,
-      m.released ? `released: ${m.released.file} (${m.released.date})` : '',
-      m.document && (!m.released || m.document !== m.released.file)
-        ? `document: ${m.document}` : '',
-      m.rounds ? `review rounds: ${m.rounds}` : '',
-      m.waiting_on ? `waiting on: ${WAITING_LABEL[m.waiting_on] || m.waiting_on}` : '',
-      (m.blocked_by || []).length ? `needs a release from: ${m.blocked_by.join(', ')}` : '',
-      (m.stale_inputs || []).length ? `built on an older release of: ${m.stale_inputs.join(', ')}` : '',
-      m.target ? `target: ${m.target}` : '',
-      m.projected ? `projected: ${m.projected.date} (${m.projected.basis})` : '',
-      m.late_by_days ? `released ${m.late_by_days} days after its target` : '',
-      tasks.length ? `open on trundlr:\n${tasks.join('\n')}` : '',
-    ].filter(Boolean).join('\n');
-
-    const note = m.state === 'done'
-      ? (m.implied ? 'implied' : (m.released ? m.released.date : ''))
-      : (WAITING_LABEL[m.waiting_on] || '');
-    const due = m.target && m.state !== 'done'
-      ? ` <small>due ${escHtml(m.target)}</small>` : '';
-    const health = m.health === 'late' || m.health === 'at_risk'
-      ? ` <small class="ms-flag">${m.health === 'late' ? 'late' : 'at risk'}</small>` : '';
-    const stale = (m.stale_inputs || []).length ? ' <small class="ms-flag">stale</small>' : '';
-    const rework = m.state !== 'done' && m.released;
-    const cls = `ms-chip ms-${m.state}${m.implied ? ' ms-implied' : ''}`
-      + `${rework ? ' ms-rework' : ''}${m.waiting_on === 'tool' ? ' ms-stalled' : ''}`;
-    return `<span class="${escHtml(cls)}" title="${escHtml(tip)}">${escHtml(milestoneLabel(m))}${note
-      ? ` <small>${escHtml(note)}</small>` : ''}${due}${health}${stale}</span>`;
-  }
-
-  function ladder(ms) {
-    return `<div class="ms-ladder">${ms.map(milestoneChip)
-      .join('<span class="ms-arrow">›</span>')}</div>`;
-  }
-
-  /** Shared milestones, then one line per venue track. */
-  function stagesCell(p) {
+  /** One project's tracks: the shared stages, plus each venue's own rungs. */
+  function tracksOf(p) {
     const shared = p.milestones.filter(m => !m.track);
     const venues = [...new Set(p.milestones.filter(m => m.track).map(m => m.track))];
     const outcome = Object.fromEntries((p.tracks || []).map(t => [t.venue, t.outcome]));
-    const tracks = venues.map(v => `<div class="ms-track">
-        <strong>${escHtml(v)}</strong>${outcome[v]
-          ? ` <span class="badge badge-ok">${escHtml(outcome[v])}</span>` : ''}
-        ${ladder(p.milestones.filter(m => m.track === v))}</div>`).join('');
-    return `${ladder(shared)}${tracks}
-      <span class="counts">${escHtml(p.done)} of ${escHtml(p.total)} done
-        · ${escHtml(p.released)} with a release on disk${p.current
-          ? ` · next: ${escHtml(p.current)}` : ''}</span>`;
+    const build = (venue, own) => {
+      const cells = {};
+      [...shared, ...own].forEach(m => {
+        const col = columnOf(m.id);
+        // A track can carry several decks (a long talk and a poster); the
+        // column shows the furthest along.
+        if (!cells[col] || rank(m) > rank(cells[col])) cells[col] = m;
+      });
+      let reach = -1;
+      COLUMNS.forEach((c, i) => {
+        const m = cells[c.key];
+        if (m && m.state === 'done') reach = Math.max(reach, i + 0.5);
+        if (m && m.state === 'in_flight') reach = Math.max(reach, i);
+      });
+      return { project: p.name, venue, outcome: venue ? outcome[venue] : null,
+               archived: p.archived, cells, reach };
+    };
+    return venues.length
+      ? venues.map(v => build(v, p.milestones.filter(m => m.track === v)))
+      : [build(null, [])];
   }
 
-  function workCell(p) {
-    const rows = [];
-    p.milestones.forEach(m => (m.open_tasks || []).forEach(t => rows.push({ t, m })));
-    const stamp = `<span class="counts">status.json ${escHtml(fileAge(p))}${p.generated_by
-      ? ` · ${escHtml(p.generated_by)}` : ''}${p.trundlr ? '' : ' · trundlr not consulted'}</span>`;
-    if (!rows.length) {
-      return `<span class="muted">nothing open on trundlr</span><br>${stamp}`;
+  /** An artifact: a document with a tab, as the figures draw a release. */
+  function artifact(cx, cy, cls) {
+    const x = cx - ART_W / 2;
+    const y = cy - ART_H / 2;
+    return `<path class="${cls}" d="M${x},${y} h9 l3,4 h${ART_W - 12} v${ART_H - 4} h-${ART_W} z"/>`;
+  }
+
+  function tip(m) {
+    return [
+      `${m.id}: ${m.state.replace('_', ' ')}${m.implied ? ' (implied by later work)' : ''}`,
+      m.released ? `released ${m.released.date}: ${m.released.file}` : '',
+      m.document && (!m.released || m.document !== m.released.file) ? `working on: ${m.document}` : '',
+      m.waiting_on ? `waiting on: ${WAITING[m.waiting_on] || m.waiting_on}` : '',
+      (m.blocked_by || []).length ? `needs: ${m.blocked_by.join(', ')}` : '',
+      (m.stale_inputs || []).length ? `built on an older ${m.stale_inputs.join(', ')}` : '',
+      m.target ? `target ${m.target}${m.health === 'late' ? ' — late'
+        : m.health === 'at_risk' ? ' — at risk' : ''}` : '',
+    ].filter(Boolean).join('\n');
+  }
+
+  function node(m, cx, cy) {
+    let mark;
+    let note = '';
+    if (m.state === 'done') {
+      mark = artifact(cx, cy, m.implied ? 'fig-implied' : 'fig-released');
+    } else if (m.state === 'in_flight') {
+      mark = artifact(cx, cy, 'fig-working');
+      note = m.health === 'late' ? 'late' : (WAITING[m.waiting_on] || '');
+    } else if (m.state === 'open' || m.state === 'unlocked') {
+      mark = `<circle class="fig-ready" cx="${cx}" cy="${cy}" r="4.5"/>`;
+    } else {
+      mark = `<circle class="fig-dot" cx="${cx}" cy="${cy}" r="3"/>`;
     }
-    const list = rows.slice(0, 4).map(({ t, m }) => `<li>${escHtml(t.title)}
-        <span class="counts">${escHtml(milestoneLabel(m))}${m.track ? ` · ${escHtml(m.track)}` : ''}
-          · ${escHtml(t.resource || '?')}${t.hours ? ` · ${escHtml(t.hours.toFixed(1))}h` : ''}${m.projected ? ` · projected ${escHtml(m.projected.date)}` : ''}</span>${t.status === 'blocked'
-          ? ' <span class="badge badge-stale">blocked</span>' : ''}${t.status === 'failed'
-          ? ' <span class="badge badge-error">failed</span>' : ''}</li>`).join('');
-    const more = rows.length > 4 ? `<li class="counts">and ${escHtml(rows.length - 4)} more</li>` : '';
-    return `<ul class="ms-board">${list}${more}</ul>${stamp}`;
+    const label = note
+      ? `<text class="fig-note" x="${cx}" y="${cy + ART_H / 2 + 11}" text-anchor="middle">${escHtml(note)}</text>` : '';
+    return `<g><title>${escHtml(tip(m))}</title>${mark}${label}</g>`;
   }
 
-  function projectRow(p) {
-    return `
-      <tr class="${p.archived ? 'ms-archived' : ''}">
-        <td><strong>${escHtml(p.name)}</strong>
-          <br><span class="counts">${escHtml(p.folder)}${p.priority
-            ? ` · priority ${escHtml(p.priority)}` : ''}${p.archived
-            ? ' · archived in trundlr' : ''}</span>${p.note
-            ? `<br><span class="badge badge-stale">${escHtml(p.note)}</span>` : ''}</td>
-        <td>${p.has_status ? stagesCell(p) : '<span class="muted">no milestones to show</span>'}</td>
-        <td>${p.has_status ? workCell(p) : ''}</td>
-      </tr>`;
+  function trackRow(t, i, cols) {
+    const cy = HEAD_H + i * ROW_H + ROW_H / 2 - 4;
+    const xs = cols.map((c, j) => LABEL_W + j * COL_W + COL_W / 2);
+    const present = cols.map((c, j) => ({ j, m: t.cells[c.key] })).filter(e => e.m);
+
+    // The path: solid into a step the work has reached, dashed beyond it.
+    let path = '';
+    for (let k = 1; k < present.length; k += 1) {
+      const a = present[k - 1];
+      const b = present[k];
+      path += `<line class="${rank(b.m) >= 2 ? 'fig-path' : 'fig-path-ahead'}"
+        x1="${xs[a.j] + ART_W / 2 + 3}" y1="${cy}" x2="${xs[b.j] - ART_W / 2 - 3}" y2="${cy}"/>`;
+    }
+    const sub = t.venue
+      ? `<text class="fig-sub" x="12" y="${cy + 12}">${escHtml(t.venue)}${t.outcome
+        ? ` · ${escHtml(t.outcome)}` : ''}</text>` : '';
+    return `<g class="${t.archived ? 'fig-archived' : ''}">
+      <text class="fig-name" x="12" y="${t.venue ? cy - 2 : cy + 4}">${escHtml(t.project)}</text>
+      ${sub}
+      ${path}${present.map(e => node(e.m, xs[e.j], cy)).join('')}</g>`;
+  }
+
+  function header(cols, height) {
+    const at = cols.findIndex(c => c.key === 'onepager');
+    const fork = at > 0
+      ? `<line class="fig-rule" x1="${LABEL_W + at * COL_W}" y1="${HEAD_H - 40}"
+          x2="${LABEL_W + at * COL_W}" y2="${height}"/>
+         <text class="fig-group" x="${LABEL_W + at * COL_W + 6}" y="${HEAD_H - 32}">the paper — one track per venue</text>` : '';
+    return fork + cols.map((c, j) => `<text class="fig-col" x="${LABEL_W + j * COL_W + COL_W / 2}"
+        y="${HEAD_H - 12}" text-anchor="middle">${escHtml(c.label)}</text>`).join('');
+  }
+
+  function legend() {
+    const item = (mark, text, x) => `<g transform="translate(${x},0)">${mark}
+      <text class="fig-sub" x="18" y="4">${escHtml(text)}</text></g>`;
+    return `<svg class="fig-legend" viewBox="0 0 720 22" role="img" aria-label="legend">
+      <g transform="translate(14,11)">
+        ${item(artifact(0, 0, 'fig-released'), 'released', 0)}
+        ${item(artifact(0, 0, 'fig-implied'), 'done, implied by later work', 100)}
+        ${item(artifact(0, 0, 'fig-working'), 'in progress', 300)}
+        ${item('<circle class="fig-ready" cx="0" cy="0" r="4.5"/>', 'ready to start', 420)}
+        ${item('<circle class="fig-dot" cx="0" cy="0" r="3"/>', 'not reached', 560)}
+      </g></svg>`;
   }
 
   registerView('/milestones', async (el) => {
+    // A chart, not prose: it takes the window's width rather than the column
+    // the reading pages keep to.
+    el.classList.add('wide');
     el.innerHTML = '<h1>Milestones</h1><p class="lede">Reading…</p>';
     const data = await api.get('/milestones');
-    const rows = data.projects;
 
-    if (!rows.length) {
+    const tracks = data.projects.filter(p => p.has_status).flatMap(tracksOf);
+    tracks.sort((a, b) => (a.archived - b.archived) || (b.reach - a.reach)
+      || a.project.localeCompare(b.project));
+    const missing = data.projects.filter(p => !p.has_status);
+
+    if (!tracks.length) {
       el.innerHTML = `<h1>Milestones</h1>
-        <div class="info">No HAARPi projects found. ${escHtml(data.folders_note || '')}</div>`;
+        <div class="info">No HAARPi project has a status file yet.</div>`;
       return;
     }
 
-    const stalled = rows.filter(p => p.milestones.some(m => m.waiting_on === 'tool'));
-    const late = rows.filter(p => p.health === 'late' || p.health === 'at_risk');
-    const missing = rows.filter(p => !p.has_status).length;
+    // A column no pathway passes through is left out: the methods review is
+    // opt-in, and most projects never take it.
+    const cols = COLUMNS.filter(c => tracks.some(t => t.cells[c.key]));
+    const width = LABEL_W + cols.length * COL_W + 12;
+    const height = HEAD_H + tracks.length * ROW_H;
 
     el.innerHTML = `
       <h1>Milestones</h1>
-      <p class="lede">Each HAARPi project's milestones and the trundlr work
-        toward them, as HAARPi wrote them in the project's
-        <code>.haarpi/status.json</code>.</p>
+      <p class="lede">Each track's pathway to its deliverable, furthest along
+        first. From each project's <code>.haarpi/status.json</code>; hover a
+        step for its documents.</p>
       <div class="card">
-        <p>${escHtml(rows.length)} HAARPi projects.${stalled.length
-          ? ` <strong>${escHtml(stalled.length)} waiting on a <code>haarpi next</code>
-            nobody has queued:</strong> ${escHtml(stalled.map(p => p.name).join(', '))}.` : ''}${late.length
-          ? ` ${escHtml(late.length)} late or at risk against a target:
-            ${escHtml(late.map(p => p.name).join(', '))}.` : ''}${missing
-          ? ` ${escHtml(missing)} without a status file yet.` : ''}</p>
-        <div class="ms-legend">
-          <span class="ms-chip ms-done">done</span>
-          <span class="ms-chip ms-done ms-implied">implied by later work</span>
-          <span class="ms-chip ms-in_flight">in flight</span>
-          <span class="ms-chip ms-in_flight ms-rework">reworking after a release</span>
-          <span class="ms-chip ms-in_flight ms-stalled">needs haarpi next</span>
-          <span class="ms-chip ms-open">opened</span>
-          <span class="ms-chip ms-unlocked">unlocked</span>
-          <span class="ms-chip ms-waiting">waiting</span>
+        ${legend()}
+        <div class="fig-scroll">
+          <svg class="fig-pathways" viewBox="0 0 ${width} ${height}"
+               style="min-width:${Math.round(width * 0.75)}px" role="img"
+               aria-label="Milestone pathways, one row per track">
+            ${header(cols, height)}
+            ${tracks.map((t, i) => trackRow(t, i, cols)).join('')}
+          </svg>
         </div>
-        <p class="muted">A milestone is done when its release exists — the
-          document HAARPi mints once every comment is resolved, named with no
-          initials (<code>260728_consGateII_litreview.docx</code>) — and
-          <em>implied</em> when it has no document of its own but something
-          downstream is done. After the paper's shared rungs each venue is its
-          own track, with its deck; <em>submitted</em> marks a track that
-          succeeded, whatever the others are doing. Targets come from
-          <code>milestones:</code> in <code>haarpi.yaml</code>. The trundlr work
-          is as old as the file, and the file's age is beside it. Hover a
-          milestone for its documents and tasks.</p>
-      </div>
-      <div class="card ms-scroll">
-        <table>
-          <thead><tr><th>Project</th><th>Milestones</th><th>Open on trundlr</th></tr></thead>
-          <tbody>${rows.map(projectRow).join('')}</tbody>
-        </table>
+        ${missing.length ? `<p class="muted">No status file yet:
+          ${escHtml(missing.map(p => p.name).join(', '))}.</p>` : ''}
       </div>`;
   });
 })();

@@ -24,6 +24,10 @@
   --bad-bg: #f8d7da; --bad-border: #f1aeb5; --bad-ink: #842029;
   --info-bg: #e7f1ff; --info-border: #b6d4fe; --info-ink: #084298;
   --neutral-bg: #e9ecef; --neutral-ink: #495057;
+  /* The HAARPi figures' palette: slate ink, indigo artifacts. */
+  --fig-text: #0f172a; --fig-ink: #334155; --fig-muted: #94a3b8;
+  --fig-art: #c7d2fe; --fig-art-edge: #4f46e5;
+  --fig-implied: #e2e8f0; --fig-implied-edge: #94a3b8; --fig-rule: #e2e8f0;
 }
 
 /* Dark mode is selected, not inverted: its own steps against a dark surface.
@@ -40,6 +44,9 @@
     --bad-bg: #331417; --bad-border: #6b2a30; --bad-ink: #f3a5aa;
     --info-bg: #10203a; --info-border: #24456f; --info-ink: #9dc2f5;
     --neutral-bg: #2a2a26; --neutral-ink: #b4b3ab;
+    --fig-text: #ececea; --fig-ink: #cbd5e1; --fig-muted: #64748b;
+    --fig-art: #3730a3; --fig-art-edge: #a5b4fc;
+    --fig-implied: #2a2a26; --fig-implied-edge: #64748b; --fig-rule: #34332f;
   }
 }
 :root[data-theme="dark"] {
@@ -52,6 +59,9 @@
   --bad-bg: #331417; --bad-border: #6b2a30; --bad-ink: #f3a5aa;
   --info-bg: #10203a; --info-border: #24456f; --info-ink: #9dc2f5;
   --neutral-bg: #2a2a26; --neutral-ink: #b4b3ab;
+  --fig-text: #ececea; --fig-ink: #cbd5e1; --fig-muted: #64748b;
+  --fig-art: #3730a3; --fig-art-edge: #a5b4fc;
+  --fig-implied: #2a2a26; --fig-implied-edge: #64748b; --fig-rule: #34332f;
 }
 
 body {
@@ -128,6 +138,7 @@ main {
   margin: 0 auto;
   padding: 1.75rem 1.5rem 5rem;
 }
+main.wide { max-width: none; }
 
 h1 {
   font-size: 1.5rem;
@@ -243,33 +254,28 @@ button.action[disabled] { opacity: .55; cursor: progress; }
 
 /* ── Milestones ─────────────────────────────────────────────────────────── */
 
-/* One chip per milestone. Done is the only green; implied-done is the same
-   green, dashed, because HAARPi inferred it rather than found a document.
-   A chip waiting on a haarpi next nobody queued gets the fault border: it is
-   the one state that will not resolve by itself. */
-.ms-scroll { overflow-x: auto; }
-.ms-ladder { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem; margin-bottom: .3rem; }
-.ms-arrow  { color: var(--text-muted); font-size: .8rem; }
-.ms-chip {
-  display: inline-block; font-size: .75rem; padding: .1rem .45rem;
-  border-radius: 10px; border: 1px solid transparent; white-space: nowrap; cursor: default;
-}
-.ms-chip small { font-size: .68rem; opacity: .8; }
-.ms-done      { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
-.ms-implied   { background: transparent; border-style: dashed; }
-.ms-in_flight { background: var(--warn-bg); color: var(--warn-ink); }
-.ms-rework    { border: 2px solid var(--ok-border); }
-.ms-stalled   { border: 2px solid var(--bad-border); }
-.ms-open      { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
-.ms-unlocked  { background: var(--surface); color: var(--neutral-ink); border-color: var(--border); }
-.ms-waiting, .ms-not_started { background: var(--neutral-bg); color: var(--text-muted); }
-.ms-flag      { color: var(--bad-ink); font-weight: 600; }
-.ms-legend    { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
-.ms-track     { margin: .15rem 0 .3rem .6rem; padding-left: .5rem; border-left: 2px solid var(--border); }
-.ms-track .ms-ladder { margin: .2rem 0 0; }
-.ms-board     { margin: 0 0 .2rem; padding-left: 1rem; font-size: .82rem; }
-.ms-board li  { margin: .1rem 0; }
-.ms-archived td { opacity: .6; }
+/* Drawn as the HAARPi figures are: Helvetica, slate ink, and a deliverable as
+   an indigo document with a tab. State is carried by form, not colour — an
+   artifact that exists, an outlined one being worked on, a dot not reached —
+   and the path is solid as far as the work has come. */
+.fig-scroll   { overflow-x: auto; }
+.fig-pathways { display: block; width: 100%; height: auto; }
+.fig-legend   { display: block; width: 100%; max-width: 720px; height: auto; margin-bottom: .5rem; }
+.fig-pathways text, .fig-legend text { font-family: Helvetica, Arial, sans-serif; }
+.fig-name     { fill: var(--fig-text); font-size: 13px; font-weight: bold; }
+.fig-sub      { fill: var(--fig-ink); font-size: 11px; }
+.fig-col      { fill: var(--fig-ink); font-size: 11px; }
+.fig-group    { fill: var(--fig-muted); font-size: 10.5px; font-style: italic; }
+.fig-note     { fill: var(--fig-ink); font-size: 9.5px; }
+.fig-rule     { stroke: var(--fig-rule); stroke-width: 1; }
+.fig-path       { stroke: var(--fig-ink); stroke-width: 1.4; }
+.fig-path-ahead { stroke: var(--fig-muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.fig-released { fill: var(--fig-art); stroke: var(--fig-art-edge); stroke-width: 1.5; }
+.fig-implied  { fill: var(--fig-implied); stroke: var(--fig-implied-edge); stroke-width: 1; }
+.fig-working  { fill: var(--surface); stroke: var(--fig-art-edge); stroke-width: 1.5; }
+.fig-ready    { fill: var(--surface); stroke: var(--fig-ink); stroke-width: 1.4; }
+.fig-dot      { fill: var(--fig-muted); }
+.fig-archived { opacity: .45; }
 
 /* ── Narrow screens ─────────────────────────────────────────────────────── */
 

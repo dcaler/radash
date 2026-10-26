@@ -4,7 +4,7 @@
 
 # raDash
 
-**Version `e28e353`.** The web interface shows the same code in the
+**Version `488277d`.** The web interface shows the same code in the
 corner of its navigation bar and on the Status page. When the two match, you are
 running what is on GitHub. The version is a hash of everything under `app/`, so
 it changes exactly when the code does, and a test fails if this line falls

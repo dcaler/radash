@@ -34,6 +34,9 @@ async function navigate() {
   const query = Object.fromEntries(new URLSearchParams(qIdx === -1 ? '' : raw.slice(qIdx + 1)));
 
   setActiveNav(path);
+  // A view may widen the page for itself (a chart, not prose); the next view
+  // starts back at the reading width.
+  el.className = '';
 
   const view = views[path] || views['/status'];
   try {
