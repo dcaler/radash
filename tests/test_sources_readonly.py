@@ -11,7 +11,7 @@ import sqlite3
 import pytest
 
 from app.config import Config
-from app.sources import haarpi, openalex, s2, scholar, trundlr, zotero
+from app.sources import haarpi, milestones, openalex, s2, scholar, trundlr, zotero
 from tests.zotero_fixture import build
 
 
@@ -55,7 +55,7 @@ def test_no_adapter_opens_a_source_for_writing():
     import inspect
     forbidden = ('open(', '.write_text(', '.write_bytes(', '.mkdir(', '.unlink(',
                  '.rename(', 'shutil.', 'os.remove', 'os.makedirs')
-    for module in (zotero, haarpi, scholar, trundlr, openalex, s2):
+    for module in (zotero, haarpi, milestones, scholar, trundlr, openalex, s2):
         src = inspect.getsource(module)
         for token in forbidden:
             assert token not in src, f"{module.__name__} contains {token!r}"

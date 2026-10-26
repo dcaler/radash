@@ -4,6 +4,12 @@
 
 # raDash
 
+**Version `e28e353`.** The web interface shows the same code in the
+corner of its navigation bar and on the Status page. When the two match, you are
+running what is on GitHub. The version is a hash of everything under `app/`, so
+it changes exactly when the code does, and a test fails if this line falls
+behind.
+
 A research portfolio observatory. It reads your reference library, your project
 folders and the public indexes, and reports where your reading, your writing and
 the literature actually stand relative to one another.
@@ -43,6 +49,12 @@ the honest case against it.
 **A frontier feed.** Each region resolves to the OpenAlex topics its own papers
 carry, and recent work in those topics is projected back into your space — the
 distance from the region is the check that the topic was a fair proxy.
+
+**Milestones.** Each HAARPi project's milestones as HAARPi itself reports
+them in `.haarpi/status.json`: the shared stages, then one track per venue
+(outline, draft, submission, deck), each marked done, implied, in flight or
+waiting, with its target, its health and the trundlr work toward it. raDash
+draws the file and derives none of it.
 
 **Two outputs.** A read-in brief, or a corpus fill list. Which one a candidate
 routes to is decided by the signal that produced it: an unconfirmed signal 3 is a
@@ -88,6 +100,7 @@ project folder; HAARPi's repository documents the format.
 |---|---|---|
 | Your Zotero library | the `zotero.sqlite` file, mounted read-only | no map: the library is what the space is fitted on |
 | Project folders | one directory per project, each with a `haarpi.yaml` brief | your projects are not placed on the map |
+| HAARPi milestones | each project's `.haarpi/status.json`, written by HAARPi after every verb | that project's row on the Milestones page says the file is missing |
 | Publications folder | `1_Publication/YYYY_Venue_Slug` directories corroborating the record | the ledger rests on the indexes alone |
 | OpenAlex, Semantic Scholar | public APIs, keyed on your OpenAlex author id | no index record; cached copies are shown with their age |
 | Google Scholar | pasted by hand into the importer | the manual citation lane stays empty |

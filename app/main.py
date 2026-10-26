@@ -34,8 +34,8 @@ from app import settings
 from app.config import get_config
 from app.database import apply_migrations, create_db_and_tables, init_engine
 from app.routers import (frontier, ledger, map as map_router, meta,
-                         outputs, planning, refresh as refresh_router, sources,
-                         status)
+                         milestones, outputs, planning, refresh as refresh_router,
+                         sources, status)
 from app.routers import settings as settings_router
 
 STATIC_DIR = _APP_DIR / "static"
@@ -132,5 +132,6 @@ app.include_router(map_router.router)
 app.include_router(status.router)
 app.include_router(frontier.router)
 app.include_router(planning.router)
+app.include_router(milestones.router)
 app.include_router(outputs.router)
 app.include_router(refresh_router.router)

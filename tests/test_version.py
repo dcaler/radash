@@ -23,3 +23,24 @@ def test_version_changes_when_source_changes(tmp_path, monkeypatch):
     finally:
         scratch.unlink()
     assert main._compute_version() == before
+
+
+def test_readme_names_the_current_version():
+    """The README carries the version so the web interface can be checked
+    against GitHub at a glance. A line that has fallen behind is worse than
+    none, because it would be believed."""
+    import re
+
+    import pytest
+
+    import app.main as main
+
+    path = main._APP_DIR.parent / "README.md"
+    if not path.exists():
+        pytest.skip("README.md is not in this tree (the image copies app/ only)")
+    readme = path.read_text()
+    stated = re.search(r"\*\*Version `([0-9a-f]{7})`", readme)
+    assert stated, "README.md has no **Version `xxxxxxx`** line"
+    assert stated.group(1) == main._compute_version(), (
+        f"README.md says {stated.group(1)}, the code is "
+        f"{main._compute_version()} — update the Version line")
